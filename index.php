@@ -1,3 +1,6 @@
+<?php
+$darkMode = getenv('FEATURE_DARK_MODE') === 'true';
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -23,6 +26,82 @@
         <link href="css/style.css" rel="stylesheet">
 <!--        <link href="css/responsive.css" rel="stylesheet">  -->
 
+        <style>
+            body.dark-mode {
+                background-color: #171614;
+                color: #cdccca;
+            }
+
+            body.dark-mode .main_header_area,
+            body.dark-mode .navbar,
+            body.dark-mode .navbar-default,
+            body.dark-mode .navbar-fixed-top,
+            body.dark-mode .footer_area,
+            body.dark-mode .best_business_area {
+                background-color: #1c1b19 !important;
+            }
+
+            body.dark-mode .check_tittle h2,
+            body.dark-mode .media-body a,
+            body.dark-mode .media-body p,
+            body.dark-mode .copy_right,
+            body.dark-mode .main_nav li a,
+            body.dark-mode .navbar-nav li a,
+            body.dark-mode .lnr,
+            body.dark-mode .fa {
+                color: #cdccca !important;
+            }
+
+            body.dark-mode .media-body p span {
+                color: #4f98a3 !important;
+                font-weight: 600;
+            }
+
+            body.dark-mode .business_content {
+                background-color: #201f1d;
+                border: 1px solid #393836;
+                padding: 15px;
+                margin-bottom: 30px;
+            }
+
+            body.dark-mode .business_content img {
+                background-color: #2d2c2a;
+            }
+
+            body.dark-mode .searchForm,
+            body.dark-mode .input-group,
+            body.dark-mode .input-group-addon,
+            body.dark-mode .form-control {
+                background-color: #22211f !important;
+                color: #cdccca !important;
+                border-color: #393836 !important;
+            }
+
+            body.dark-mode .form-control::placeholder {
+                color: #797876 !important;
+            }
+
+            body.dark-mode .learn_mor {
+                background-color: #4f98a3 !important;
+                border-color: #4f98a3 !important;
+                color: #171614 !important;
+            }
+
+            body.dark-mode .learn_mor:hover,
+            body.dark-mode .learn_mor:focus {
+                background-color: #227f8b !important;
+                border-color: #227f8b !important;
+                color: #171614 !important;
+            }
+
+            body.dark-mode .error-content {
+                background-color: #201f1d;
+                color: #cdccca;
+                border: 1px solid #393836;
+                padding: 20px;
+            }
+        </style>
+
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>
@@ -30,7 +109,7 @@
           <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
     </head>
-    <body>
+    <body <?php if ($darkMode): ?>class="dark-mode"<?php endif; ?>>
         <!--==========Main Header==========-->
         <header class="main_header_area">
             <nav class="navbar navbar-default navbar-fixed-top" id="main_navbar">
@@ -90,7 +169,7 @@
             <div class="slider_inner">
                 <div class="camera_caption">
                     <h2 class="wow fadeInUp animated">Make Your Shopping Easy</h2>
-                    <h5 class="wow fadeIn animated" data-wow-delay="0.3s">Find everything accordingly</h5>
+                    <h5 class="wow fadeIn animated" data-wow-delay="0.3s">THIS IS A DEMO WEBSITE VERSION2</h5>
                     <a class="learn_mor wow fadeInU" data-wow-delay="0.6s" href="#product-list">Show Now!</a>
                 </div>
             </div>
@@ -103,66 +182,50 @@
             </div>
             <div class="row it_works">
               <?php
-
-                        // $link = mysqli_connect('172.20.1.101', 'ecomuser', 'ecompassword', 'ecomdb');
-                        // Fetch database connection details directly from environment variables
-                        $dbHost = getenv('DB_HOST');
+                        $dbHost = getenv('DB_HOST') ?: 'mysql-service';
                         $dbUser = getenv('DB_USER');
                         $dbPassword = getenv('DB_PASSWORD');
                         $dbName = getenv('DB_NAME');
 
-                        // Attempt to connect to the database
                         $link = mysqli_connect($dbHost, $dbUser, $dbPassword, $dbName);
 
                         if ($link) {
-                        $res = mysqli_query($link, "select * from products;");
-                        while ($row = mysqli_fetch_assoc($res)) { ?>
-
-                <div class="col-md-3 col-sm-6 business_content">
-                    <?php echo '<img src="img/' . $row['ImageUrl'] . '" alt="">' ?>
-                    <div class="media">
-                        <div class="media-left">
-
-                        </div>
-                        <div class="media-body">
-                            <a href="#"><?php echo $row['Name'] ?></a>
-                            <p>Purchase <?php echo $row['Name'] ?> at the lowest price <span><?php echo $row['Price'] ?>$</span></p>
-                        </div>
-                    </div>
-                </div>
-
+                            $res = mysqli_query($link, "select * from products;");
+                            while ($row = mysqli_fetch_assoc($res)) { ?>
+                                <div class="col-md-3 col-sm-6 business_content">
+                                    <?php echo '<img src="img/' . $row['ImageUrl'] . '" alt="">' ?>
+                                    <div class="media">
+                                        <div class="media-left"></div>
+                                        <div class="media-body">
+                                            <a href="#"><?php echo $row['Name'] ?></a>
+                                            <p>Purchase <?php echo $row['Name'] ?> at the lowest price <span><?php echo $row['Price'] ?>$</span></p>
+                                        </div>
+                                    </div>
+                                </div>
                 <?php
-                        }
-                    }
-                    else {
+                            }
+                        } else {
                 ?>
                 <div style="width: 100%">
-                <div class="error-content">
-
-                    <h1>Database connection error</h1>
-                    <p>
-                    <?php
-                          echo mysqli_connect_errno() . ":" . mysqli_connect_error();
-                    ?>
-                    </p>
-                  </div>
-                  </div>
-                  <?php
-                    }
-                  ?>
-
-
+                    <div class="error-content">
+                        <h1>Database connection error</h1>
+                        <p>
+                        <?php
+                            echo mysqli_connect_errno() . ":" . mysqli_connect_error();
+                        ?>
+                        </p>
+                    </div>
+                </div>
+                <?php
+                        }
+                ?>
             </div>
         </section>
 
-
         <footer class="footer_area row">
             <div class="container custom-container">
-
-
-
                 <div class="copy_right_area">
-                    <h4 class="copy_right">© Copyright 2019 Kodekloud Ecommerce | All Rights Reserved</h4>
+                    <h4 class="copy_right">© Copyright 2026 Kodekloud Ecommerce | All Rights Reserved</h4>
                 </div>
             </div>
         </footer>
