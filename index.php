@@ -190,7 +190,7 @@ $darkMode = getenv('FEATURE_DARK_MODE') === 'true';
                         $link = mysqli_connect($dbHost, $dbUser, $dbPassword, $dbName);
 
                         if ($link) {
-                            $res = mysqli_query($link, "select * from products;");
+                            $res = mysqli_query($link, "select * from Products;");
                             while ($row = mysqli_fetch_assoc($res)) { ?>
                                 <div class="col-md-3 col-sm-6 business_content">
                                     <?php echo '<img src="img/' . $row['ImageUrl'] . '" alt="">' ?>
