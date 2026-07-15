@@ -27,82 +27,6 @@ $darkMode = getenv('FEATURE_DARK_MODE') === 'true';
 <!--        <link href="css/responsive.css" rel="stylesheet">  -->
 
         <style>
-            .promo-banner {
-    background: linear-gradient(135deg, #01696f, #0c4e54);
-    color: #f9f8f4;
-    padding: 40px 20px;
-    text-align: center;
-}
-
-.promo-banner-content {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.promo-badge {
-    display: inline-block;
-    background-color: #fdd835;
-    color: #171614;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    margin-bottom: 15px;
-}
-
-.promo-banner h3 {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 12px;
-}
-
-.promo-banner p {
-    font-size: 16px;
-    margin-bottom: 20px;
-    color: #e6f4f1;
-}
-
-.promo-btn {
-    display: inline-block;
-    background-color: #ffffff;
-    color: #01696f;
-    padding: 12px 24px;
-    border-radius: 30px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.promo-btn:hover,
-.promo-btn:focus {
-    background-color: #f3f3f3;
-    color: #0c4e54;
-    text-decoration: none;
-}
-
-/* Dark mode support */
-body.dark-mode .promo-banner {
-    background: linear-gradient(135deg, #227f8b, #1a626b);
-    color: #f9f8f4;
-}
-
-body.dark-mode .promo-badge {
-    background-color: #e8af34;
-    color: #171614;
-}
-
-body.dark-mode .promo-btn {
-    background-color: #f9f8f4;
-    color: #1a626b;
-}
-
-body.dark-mode .promo-btn:hover,
-body.dark-mode .promo-btn:focus {
-    background-color: #dcd9d5;
-    color: #171614;
-}
             body.dark-mode {
                 background-color: #171614;
                 color: #cdccca;
@@ -245,22 +169,11 @@ body.dark-mode .promo-btn:focus {
             <div class="slider_inner">
                 <div class="camera_caption">
                     <h2 class="wow fadeInUp animated">Make Your Shopping Easy</h2>
-                    <h5 class="wow fadeIn animated" data-wow-delay="0.3s">SUMMER TECH SALE - V1</h5>
+                    <h5 class="wow fadeIn animated" data-wow-delay="0.3s">THIS IS A DEMO WEBSITE VERSION2</h5>
                     <a class="learn_mor wow fadeInU" data-wow-delay="0.6s" href="#product-list">Show Now!</a>
                 </div>
             </div>
         </section>
-        <!-- Promotional Banner -->
-<section class="promo-banner">
-    <div class="container">
-        <div class="promo-banner-content">
-            <span class="promo-badge">Limited Time</span>
-            <h3>Summer Tech Sale - Up to 25% Off Selected Gadgets</h3>
-            <p>Fresh deals on laptops, drones, phones, and accessories. Shop the campaign before it ends.</p>
-            <a href="#product-list" class="promo-btn">Shop Deals</a>
-        </div>
-    </div>
-</section>
         <!--==========End Slider area==========-->
 
         <section class="best_business_area row">
