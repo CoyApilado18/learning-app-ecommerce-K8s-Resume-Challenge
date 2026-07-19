@@ -23,7 +23,7 @@ spec:
         app: ecom-webapp
     spec:
       containers:
-      - image: testyoc/ecomwebapp:v3
+      - image: testyoc/ecomwebapp:v2
         name: ecom-webapp
         readinessProbe:
           httpGet:
