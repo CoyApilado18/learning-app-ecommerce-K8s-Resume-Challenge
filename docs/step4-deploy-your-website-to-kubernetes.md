@@ -1,6 +1,9 @@
 
+# My Kubernetes deployment via Kubeadm on my local machine with one Controlplane and one Worker node. 
+## See gitub repo to build your local kubeadm cluster https://github.com/CoyApilado18/Build-your-local-Kubernetes-cluster.git
+
 ## Context 
-- Create deployment manifests for the webapp and database along with application config using a configmap.
+- Create a deployment manifests for the webapp and database along with application config using a configmap.
 - Deploy the website in kubernetes in my local kubeadm using the docker image created in step 2 with the necessary env vars and database connection with the webapp. 
 
 ## Goals

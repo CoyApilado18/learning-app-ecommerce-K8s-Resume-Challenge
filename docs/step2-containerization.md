@@ -25,7 +25,7 @@ git checkout -b <your-branch-name>
 git checkout <your-branch-name>
 
 ## 2. Web Application Docker Image
-# Image name chosen for step 2 (Docker Hub) : '<dockerhub-username>/ecomwebapp:v1'
+### Image name chosen for step 2 (Docker Hub) : '<dockerhub-username>/ecomwebapp:v1'
 create Dockerfile -> see Dockerfile in root dir where it's written in PHP. Base image:php:7.4-apache, install mysqli (connection to MySQL DB) via docker-php-install, copy the php app to /var/www/html, make sure PHP code will use mysql-service as the host 
 
 ## build and tag the image locally
