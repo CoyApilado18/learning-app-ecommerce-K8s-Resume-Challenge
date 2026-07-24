@@ -37,6 +37,10 @@ spec:
           httpGet:
             path: /healthz.php
             port: 80
+          #exec: step 11 simulate a liveness probe using exec command
+            #command:
+            #- cat
+            #- /tmp/healthy  
           initialDelaySeconds: 15
           periodSeconds: 10
           timeoutSeconds: 2

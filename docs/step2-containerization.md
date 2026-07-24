@@ -28,11 +28,11 @@ git checkout <your-branch-name>
 ### Image name chosen for step 2 (Docker Hub) : '<dockerhub-username>/ecomwebapp:v1'
 create Dockerfile -> see Dockerfile in root dir where it's written in PHP. Base image:php:7.4-apache, install mysqli (connection to MySQL DB) via docker-php-install, copy the php app to /var/www/html, make sure PHP code will use mysql-service as the host 
 
-## build and tag the image locally
+## Build and tag the image locally
 docker build -t tesyoc/ecomwebapp:v1 -f Dockerfile .
-## check/verify the image is built successfully. This lists local docker images, filtered to show the newly build docker image ecomwebapp with tag v1.
+## Check/verify the image is built successfully. This lists local docker images, filtered to show the newly build docker image ecomwebapp with tag v1.
 docker images | grep ecomwebapp
-## or just the docker images command then just manually search the image with your dockerhub-username/ecomwebapp:v1
+## Or just the docker images command then just manually search the image with your dockerhub-username/ecomwebapp:v1
 docker images
 
 ## Login to Docker hub and push the image
