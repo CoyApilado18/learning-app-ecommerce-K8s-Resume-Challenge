@@ -31,10 +31,10 @@
 ## Apply the readiness and liveness probes 
 k apply -f website-deployment.yaml 
 
-## Simulate a failure for probe with file existence check. Will pach the our webapp deployment and temporarily remove the httpGet probe and replace an exec probe to our livenessProbe to check if a file exist in our manifest file.
+## Simulate a failure for probe with file existence check. Will patch our webapp deployment and temporarily remove the httpGet probe and replace an exec probe handler to our livenessProbe to check if a file exist in our manifest file.
 - livenessProbe:
     exec:
-      commandd:
+      command:
         - cat
         - /tmp/healthy 
 
@@ -43,22 +43,6 @@ k apply -f website.deployment.yaml
 
 ## Wait and confirm the ecomwebapp pods stays healthy
 k -n ecomwebapp get po -w
-
-## If you want you can check the Events section of the pod and you should see an output:
-k -n ecomwebapp describe po <pod-name>
-Events:
-  Type     Reason     Age                 From               Message
-  ----     ------     ----                ----               -------
-  Normal   Scheduled  2m8s                default-scheduler  Successfully assigned ecomwebapp/ecom-webapp-84db6fcbb6-5zlpj to node01
-  Normal   Killing    38s (x2 over 88s)   kubelet            Container ecom-webapp failed liveness probe, will be restarted
-  Normal   Pulled     34s (x3 over 2m7s)  kubelet            Container image "testyoc/ecomwebapp:v2" already present on machine
-  Normal   Created    33s (x3 over 2m7s)  kubelet            Created container: ecom-webapp
-  Normal   Started    33s (x3 over 2m7s)  kubelet            Started container ecom-webapp
-  Warning  Unhealthy  33s (x3 over 83s)   kubelet            Readiness probe failed: Get "http://192.168.196.173:80/readyz.php": dial tcp 192.168.196.173:80: connect: connection refused
-  Warning  Unhealthy  8s (x8 over 108s)   kubelet            Liveness probe failed: cat: /tmp/healthy: No such file or directory
-
-## You can also check the status of the ecomwebapp pods and check the RESTARTS column
-k -n ecomwebapp get po
 
 ## Once healthy, exec in one of the pod and create the file
 k -n ecomwebapp exec -it <pod-name> -- touch /tmp/healthy
