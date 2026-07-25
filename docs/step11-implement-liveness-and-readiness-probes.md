@@ -50,6 +50,6 @@ k -n ecomwebapp exec -it <pod-name> -- touch /tmp/healthy
 ## Observe the pods how it restarts in real time using the -w option. In this simulation I have 2 replicas of the ecomwebapp pods and I created the file to pod ecom-webapp-84db6fcbb6-vtsrk. The pod ecom-webapp-84db6fcbb6-wqssl keeps restarting until it went to CrashLoopBackOff status while the pod that I created the file doesn't. This demonstrates how Kubernetes automatically restarts unresponsive pods and delays traffic until they're ready, enhancing the applications reliability and availability. 
 k -n ecomwebapp get po -w
 
-
+![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/3b35d209b4b196e6ee3bd417a98e739cdc7bad74/docs/images/livenessProbe.png)
 
 
