@@ -9,6 +9,8 @@
 - Make sure the webapp and database deployment is wired correctly via the env var and configmaps having an up and running ecommerce site in kubernetes. 
 
 # Commands and Notes
+
+## ** Manually run to create objects in Kubernetes in proper order and check the objects created. **
 ## Create namespace
 ```bash
 kubectl create namespace ecomwebapp
@@ -67,6 +69,13 @@ kubectl describe job -n ecomwebapp
 ```bash
 kubectl get svc -n ecomwebapp
 kubectl describe svc -n ecomwebapp
+```
+
+## Or just apply the manifests files for the directories of the ecomdb/ and ecomwebapp.  
+- ecomdb/ first then ecomwebapp second
+```bash
+kubectl apply -f ecomdb/
+kubectl apply -f ecomwebapp/
 ```
 
 ## To test locally using kubectl port-forward, then open a browser and check via http://localhost:
