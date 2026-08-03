@@ -72,7 +72,7 @@ kubectl describe svc -n ecomwebapp
 ```
 
 ## -- Or just apply the manifests files for the directories of the ecomdb/ and ecomwebapp. --  
-- ecomdb/ first then ecomwebapp second
+- ecomdb/ first then ecomwebapp second. The file names are numbered accordingly so that when applied, objects will be created in proper order.
 ```bash
 kubectl apply -f ecomdb/
 kubectl apply -f ecomwebapp/
