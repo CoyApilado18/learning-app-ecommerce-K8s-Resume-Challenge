@@ -74,5 +74,5 @@ kubectl describe svc -n ecomwebapp
 kubectl -n ecomwebapp port-forward svc/ecom-web-svc 8080:80
 ```
 
-![alt images]()
+![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/29ec15a78f1189d1cbc4b6320eb34e584c32ef8a/docs/images/localhost-website.png)
 
