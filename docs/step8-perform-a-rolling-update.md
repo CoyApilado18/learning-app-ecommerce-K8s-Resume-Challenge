@@ -24,8 +24,8 @@ docker images
 ## Push to docker hub
 docker push <yourdockerhub-username/image-name:tag>
 
-## Rollout the new image, change the ecomwebapp deployment's image with the new version of the image (spec.containers.image: testyoc/ecomwebapp:v3) then kubectl apply cmd with the --record=true flag so that k8s stores a short note in the history such as the cmd that trigerred the rollout. We'll go with this as this is what task suggest in this step
-k -n ecomwebapp apply -f website-deployment.yaml --record=true
+## Rollout the new image, change the ecomwebapp deployment's image with the new version of the image (spec.containers.image: testyoc/ecomwebapp:v3) then kubectl apply cmd.
+k -n ecomwebapp apply -f website-deployment.yaml
 
 ## Restart the ecomwebapp pods for changes to kick in. since the pods were deleted, you'll need to run the kubectl port-forward again to open the tunnel for localhost then open http://localhost:8080
 k -n ecomwebapp delete po -l app=ecom-webapp
