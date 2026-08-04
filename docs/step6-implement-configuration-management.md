@@ -1,9 +1,9 @@
 # Context
 - Modify the php app to enable a "dark mode" background feature of the ecomwebapp website. A feature toggle via an external configuration using a configmap that allows the ecommerce webapp to enable dark mode background. 
 - The configmap is a configuration data that controls enabling/disabling background color of the ecommerce webapp.
-- Current theme is white background.
+- Current theme's white background.
 
-![image alt]()
+![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ef1280e825cdb368e9f74ff4a2eb92790f823c01/docs/images/localhost-website-white-theme.png)
 
 # Goals
 - Create a configmap for the feature toggle dark mode and apply it to ecomwebapp deployment as env var from the configmap. Instead of baking this feature inside the image, we can control the setting of the background for our ecom-webapp via a configmap.
