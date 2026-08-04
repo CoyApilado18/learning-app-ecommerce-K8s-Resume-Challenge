@@ -29,4 +29,6 @@ k -n ecomwebapp delete po -l app=ecom-webapp
 k -n ecomwebapp port-forward svc/ecom-web-svc 8080:80
 ```
 
+- Feature toggle dark theme implemented via app-config configmap.
+
 ![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/29ec15a78f1189d1cbc4b6320eb34e584c32ef8a/docs/images/localhost-website.png)
