@@ -61,4 +61,4 @@ ab -n 2000 -c 150 http://localhost:8080/
 ![image alt](HPA-result.png)
 
 
-![image alt](HPA-triggered-pod.png)
+![image alt](HPA-triggered-pod-and-scaledin.png)
