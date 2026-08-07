@@ -30,7 +30,7 @@ k apply –f https://github.com/kubernetes-sigs/metrics-server/releases/latest/d
 ```bash
 k -n <namespace> austoscale deployment <name-of-deployment> --cpu-percent=CPU --min=<desired-min-num-of-replicas> --max=<desired-max-num-of-replicas> --dry-run=client-oyaml > some-name.yaml
 k -n ecomwebapp autoscale deployment ecom-webapp --cpu-percent=50 --min=2 --max=10 --dry-run=client -oyaml > ecomwebapp-hpa.yaml
-k -n apply -f hpa.yaml
+k apply -f hpa.yaml
 ```
 ![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/199fc1d8c447d4aaeafadbfcec34584344bb4089/docs/images/hpa-created.png)
 
@@ -53,7 +53,7 @@ k -n <namespace> port-forward svc/<service-name> 8080:<service-port>
 k -n ecomwebapp port-forward svc/ecom-web-svc 8080:80
 ```
 
-## Run load test, generate load and see it scale. Keep the url ending in / otherwise Apache Bench can fail without it. -n = total requests and -c = concurrent request at a time. 
+## Run load test, generate load and see it scale. Keep the url ending in / otherwise Apache Bench can fail without it. Where -n = total requests and -c = concurrent request at a time. 
 ```bash
 ab -n 2000 -c 150 http://localhost:8080/
 ```
