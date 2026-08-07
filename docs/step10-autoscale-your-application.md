@@ -25,6 +25,10 @@ k apply –f https://github.com/kubernetes-sigs/metrics-server/releases/latest/d
 - To address this, edit the metrics-server pod in the kube-system ns and add the "--kubelet-insecure-tls".
 ![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/199fc1d8c447d4aaeafadbfcec34584344bb4089/docs/images/kubelet-insecure-tls.png)
 
+- Metrics Server Installed successfully with CPU and Memory values from nodes and pods (in the ecomwebapp namespace).
+![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/df7019dff86bb89db9905a51a9c34623b4c85425/docs/images/metrics-server.png)
+
+
 ## Create an HPA object. 
 - To easily create the HPA manifest, you can --dry-run=client then output to yaml file then just edit the apply. See 03-hpa-ecomwebapp.yaml in the ecomwebapp/
 ```bash
@@ -33,6 +37,7 @@ k -n ecomwebapp autoscale deployment ecom-webapp --cpu-percent=50 --min=2 --max=
 k apply -f hpa.yaml
 ```
 ![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/199fc1d8c447d4aaeafadbfcec34584344bb4089/docs/images/hpa-created.png)
+![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/df7019dff86bb89db9905a51a9c34623b4c85425/docs/images/ecomwebapp-hpa.png)
 
 ## There should be a requests and limits for the cpu resource in your deployment yaml file. See 01-website-deployment.yaml (spec.containers.resources.requests.limits). Run the jsonpath command to make sure the deployment have the resources requests and limits block.
 ```bash
