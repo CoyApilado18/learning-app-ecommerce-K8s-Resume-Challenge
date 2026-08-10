@@ -46,12 +46,22 @@ k -n ecomwebapp get po -owide
 ## Further testing shows, when I exec into the db pod, input db credentials and ran sql scripts; to show database/tables, a select statement for the Products table, the result shows I can still see the database pod before the pod deletion. This demonstrates data persistence even after the db pod restart took place.
 ```bash
 k -n ecomwebapp exec -it -- sh
-- db credentials:
+```
+- Input db credentials.
+```bash
 mariadb -u <db-username> -p<db-password>
-- sql:
+```
+
+- Run some sql scripts to verify ecomdb Database and Products table still exists.
+```bash
 SHOW DATABASES;
 USE ecomdb;
 select * from Products;
 ```
 
 ![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/92f076e6c579326b9087c28dcc55a2d74ec21102/Docs/images/exec-db-pod.png)
+
+### Resource links:  
+- Persistent Volume: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+- Persissten Volume Claims: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+- hostPath PV: https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
