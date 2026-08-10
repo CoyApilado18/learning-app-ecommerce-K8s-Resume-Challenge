@@ -63,5 +63,5 @@ select * from Products;
 
 ### Resource links:  
 - Persistent Volume: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
-- Persissten Volume Claims: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+- Persistent Volume Claims: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
 - hostPath PV: https://kubernetes.io/docs/concepts/storage/volumes/#hostpath
