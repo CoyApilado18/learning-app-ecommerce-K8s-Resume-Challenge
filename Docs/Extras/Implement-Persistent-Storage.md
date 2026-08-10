@@ -33,7 +33,7 @@ k apply -f ecomdb/05-pv-pvc.yaml
 k -n ecomwebapp get pv
 k -n ecomwebapp get pvc
 ```
-![image alt](pv-pvc-bound.png)
+![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/92f076e6c579326b9087c28dcc55a2d74ec21102/Docs/images/pv-pvc-bound.png)
 
 ## The MariaDB pod shows it was running on node01 and a pod restart happened just 9 seconds ago and then it shows the pod is scheduled on the same node and is running and ready. This clearly shows the persistence of the db pod even after a restart. 
 ```bash
@@ -41,7 +41,7 @@ k -n ecomwebapp get po mysql-76d94b96cb-gznfg -owide --show-labels
 k -n ecomwebapp delete po -l app=mysql
 k -n ecomwebapp get po -owide
 ```
-![image alt](mysql-pod-restart.png)
+![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/92f076e6c579326b9087c28dcc55a2d74ec21102/Docs/images/mysql-pod-restart.png)
 
 ## Further testing shows, exec into the db pod, input db credentials and ran sql script to show database/tables and ran a select statement for the Products table. Result shows I can still see the database pod before the pod deletion.
 ```bash
@@ -53,4 +53,4 @@ SHOW DATABASES;
 USE ecomdb;
 select * from Products;
 ```
-![image alt](exec-db-pod.png)
+![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/92f076e6c579326b9087c28dcc55a2d74ec21102/Docs/images/exec-db-pod.png)
