@@ -1,179 +1,35 @@
 # Introduction 
 
-This is a sample e-commerce application built for learning purposes.  
+Welcome to my Kubernetes Resume Challenge documentation in reference to the link below. This is a sample e-commerce application written in PHP and uses MariaDB image for the database and this is built for learning purposes. This homelab is specially for someone new to containerized applications or, if you want a refresher with Docker containers and Kubernetes for container orchestration or, if you're a seasoned Devops practitioner, you'll still find this useful to build your K8s cluster for your homelab with minimum specification requirements. This hands-on challenge involves several technologies that you'll be exposed to; from source code version control using GitHub, deployment to cloud using AWS EKS and ECR for container registry and automating deployment via CI/CD through a pipeline using GitHub Actions. 
 
-Here's how to deploy it on CentOS systems:
+[Reference URL:](https://cloudresumechallenge.dev/docs/extensions/kubernetes-challenge/?utm_source=substack&utm_medium=email#intro )
 
-## Deploy Pre-Requisites
+This project documents my hands-on work with:  
+- Kubernetes cluster administration
+- Containerized applications (Docker)
+- Helm charts
+- ConfigMaps and Secrets, Horizontal Pod Autoscaling (HPA), Data persistence (Persistent Volume & Persistent Volume Claim)
+- Liveness and Readiness Probes
+- CI/CD pipelines via GitHub Actions
+- AWS EKS deployment and AWS ECR for container registry
 
-1. Install FirewallD
+## Documentation 
+- [Step 01:Kubernetes-Certification](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/01-Certification.md)
+- [Step 02: Containerize-Your-Ecommerce-Website-and-Database](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/02-Containerize-Your-Ecommerce-Website-and-Database.md)
+- [Step 03 and 05: Setup-k8s-on-AWS-using-EKS-and-expose-your-website](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/03and05-Setup-k8s-on-AWS-using-EKS-and-expose-your-website.md)
+- [Step 04: Deploy-Your-website-to-Kubernetes-kubeadm-Local-Cluster](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/04-Deploy-Your-website-to-Kubernetes-kubeadm-Local-Cluster.md)
+- [Step 06: Implement-Configuration-Management](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/06-Implement-Configuration-Management.md)
+- [Step 07: Scale-Your-Application](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/07-Scale-Your-Application.md)
+- [Step 08: Perform-a-Rolling-Update](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/08-Perform-a-Rolling-Update.md)
+- [Step 09: Rollback-a-Deployment](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/09-Rollback-a-Deployment.md)
+- [Step 10: Autoscale-Your-Application](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/10-Autoscale-Your-Application.md)
+- [Step 11: Implement-Liveness-and-Readiness-Probes](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/11-Implement-Liveness-and-Readiness-Probes.md)
+- [Step 12: Utilize-Configmaps-and-Secrets](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/11-Implement-Liveness-and-Readiness-Probes.md)  
 
-```
-sudo yum install -y firewalld
-sudo systemctl start firewalld
-sudo systemctl enable firewalld
-sudo systemctl status firewalld
-```
-
-## Deploy and Configure Database
-
-1. Install MariaDB
-
-```
-sudo yum install -y mariadb-server
-sudo vi /etc/my.cnf
-sudo systemctl start mariadb
-sudo systemctl enable mariadb
-```
-
-2. Configure firewall for Database
-
-```
-sudo firewall-cmd --permanent --zone=public --add-port=3306/tcp
-sudo firewall-cmd --reload
-```
-
-3. Configure Database
-
-```
-$ mysql
-MariaDB > CREATE DATABASE ecomdb;
-MariaDB > CREATE USER 'ecomuser'@'localhost' IDENTIFIED BY 'ecompassword';
-MariaDB > GRANT ALL PRIVILEGES ON *.* TO 'ecomuser'@'localhost';
-MariaDB > FLUSH PRIVILEGES;
-```
-
-> ON a multi-node setup remember to provide the IP address of the web server here: `'ecomuser'@'web-server-ip'`
-
-4. Load Product Inventory Information to database
-
-Create the db-load-script.sql
-
-```
-cat > db-load-script.sql <<-EOF
-USE ecomdb;
-CREATE TABLE products (id mediumint(8) unsigned NOT NULL auto_increment,Name varchar(255) default NULL,Price varchar(255) default NULL, ImageUrl varchar(255) default NULL,PRIMARY KEY (id)) AUTO_INCREMENT=1;
-
-INSERT INTO products (Name,Price,ImageUrl) VALUES ("Laptop","100","c-1.png"),("Drone","200","c-2.png"),("VR","300","c-3.png"),("Tablet","50","c-5.png"),("Watch","90","c-6.png"),("Phone Covers","20","c-7.png"),("Phone","80","c-8.png"),("Laptop","150","c-4.png");
-
-EOF
-```
-
-Run sql script
-
-```
-
-sudo mysql < db-load-script.sql
-```
+Extras:
+- [Implement-Persistent-Storage](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/6a965c06f28ddfc23d42fa15fe0d9b6edbbd1f3c/docs/Extras/Implement-Persistent-Storage.md)
+- 
 
 
-## Deploy and Configure Web
 
-1. Install required packages
-
-```
-sudo yum install -y httpd php php-mysqlnd
-sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
-sudo firewall-cmd --reload
-```
-
-2. Configure httpd
-
-Change `DirectoryIndex index.html` to `DirectoryIndex index.php` to make the php page the default page
-
-```
-sudo sed -i 's/index.html/index.php/g' /etc/httpd/conf/httpd.conf
-```
-
-3. Start httpd
-
-```
-sudo systemctl start httpd
-sudo systemctl enable httpd
-```
-
-4. Download code
-
-```
-sudo yum install -y git
-sudo git clone https://github.com/kodekloudhub/learning-app-ecommerce.git /var/www/html/
-```
-
-<!-- 5. Update index.php
-
-Update [index.php](https://github.com/kodekloudhub/learning-app-ecommerce/blob/13b6e9ddc867eff30368c7e4f013164a85e2dccb/index.php#L107) file to connect to the right database server. In this case `localhost` since the database is on the same server.
-
-```
-sudo sed -i 's/172.20.1.101/localhost/g' /var/www/html/index.php
-
-              <?php
-                        $link = mysqli_connect('172.20.1.101', 'ecomuser', 'ecompassword', 'ecomdb');
-                        if ($link) {
-                        $res = mysqli_query($link, "select * from products;");
-                        while ($row = mysqli_fetch_assoc($res)) { ?>
-```
-
-> ON a multi-node setup remember to provide the IP address of the database server here.
-```
-sudo sed -i 's/172.20.1.101/localhost/g' /var/www/html/index.php
-```
--->
-
-5. Create and Configure the `.env` File
-
-   Create an `.env` file in the root of your project folder.
-
-   ```sh
-   cat > /var/www/html/.env <<-EOF
-   DB_HOST=localhost
-   DB_USER=ecomuser
-   DB_PASSWORD=ecompassword
-   DB_NAME=ecomdb
-   EOF
-
-6. Update `index.php`
-
-   Update the `index.php` file to load the environment variables from the `.env` file and use them to connect to the database.
-
-   ```php
-   <?php
-   // Function to load environment variables from a .env file
-   function loadEnv($path)
-   {
-       if (!file_exists($path)) {
-           return false;
-       }
-
-       $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-       foreach ($lines as $line) {
-           if (strpos(trim($line), '#') === 0) {
-               continue;
-           }
-
-           list($name, $value) = explode('=', $line, 2);
-           $name = trim($name);
-           $value = trim($value);
-           putenv(sprintf('%s=%s', $name, $value));
-       }
-       return true;
-   }
-
-   // Load environment variables from .env file
-   loadEnv(__DIR__ . '/.env');
-
-   // Retrieve the database connection details from environment variables
-   $dbHost = getenv('DB_HOST');
-   $dbUser = getenv('DB_USER');
-   $dbPassword = getenv('DB_PASSWORD');
-   $dbName = getenv('DB_NAME');
-
-   ?>
-
-   ON a multi-node setup, remember to provide the IP address of the database server in the .env file.
-
-
-7. Test
-
-```
-curl http://localhost
-```
+## See my gitub repo to build your local kubeadm cluster https://github.com/CoyApilado18/Build-your-local-Kubernetes-cluster.git with one Controlplane and one Worker node. I deployed this using Ubuntu 22.04 for my homelab.
