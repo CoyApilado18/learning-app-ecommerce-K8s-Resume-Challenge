@@ -3,7 +3,6 @@
 - Pass CKA -for renewal.
 
 # Goal achieved:
-- Verify via Credly 
 ![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/e33191734b5f27470eef3897721f488398bf6e94/docs/images/CKAD.png)
  
 ![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/f0605e0aa24819a316a1fff802573f15b6e239ff/Docs/images/CKA.png)
