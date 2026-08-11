@@ -32,4 +32,4 @@ Extras:
 
 
 
-## See my gitub repo to build your local kubeadm cluster https://github.com/CoyApilado18/Build-your-local-Kubernetes-cluster.git with one Controlplane and one Worker node. I deployed this using Ubuntu 22.04 for my homelab.
+- See my gitub repo to build your local kubeadm cluster https://github.com/CoyApilado18/Build-your-local-Kubernetes-cluster.git with one Controlplane and one Worker node. I deployed this using Ubuntu 22.04 for my homelab.
