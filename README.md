@@ -13,6 +13,12 @@ This project documents my hands-on work with:
 - CI/CD pipelines via GitHub Actions
 - AWS EKS deployment and AWS ECR for container registry
 
+## High level Overview Diagram of the Ecommerce website 
+![image alt](Diagram.png)  
+
+- Running Ecommerce website via (http://localhost:8080/)
+![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/a5b1a2265ea3c77e86bf1b4e2d75a91b605b8e21/docs/images/localhost-website-white-theme.png)  
+
 ## Documentation 
 - [Step 01:Kubernetes-Certification](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/01-Certification.md)
 - [Step 02: Containerize-Your-Ecommerce-Website-and-Database](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ae8d15c4aa3f6228ece6d4787bfd57c02e0c5621/docs/Steps/02-Containerize-Your-Ecommerce-Website-and-Database.md)
@@ -28,7 +34,6 @@ This project documents my hands-on work with:
 
 Extras:
 - [Implement-Persistent-Storage](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/6a965c06f28ddfc23d42fa15fe0d9b6edbbd1f3c/docs/Extras/Implement-Persistent-Storage.md)
-
 
 ## Build your local kubeadm homelab
 - See my gitub repo to build your local kubeadm cluster https://github.com/CoyApilado18/Build-your-local-Kubernetes-cluster.git with one Controlplane and one Worker node. I used Ubuntu 22.04 for this project.
