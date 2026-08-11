@@ -28,8 +28,7 @@ This project documents my hands-on work with:
 
 Extras:
 - [Implement-Persistent-Storage](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/6a965c06f28ddfc23d42fa15fe0d9b6edbbd1f3c/docs/Extras/Implement-Persistent-Storage.md)
-- 
 
 
-
-- See my gitub repo to build your local kubeadm cluster https://github.com/CoyApilado18/Build-your-local-Kubernetes-cluster.git with one Controlplane and one Worker node. I deployed this using Ubuntu 22.04 for my homelab.
+## Build your local kubeadm homelab
+- See my gitub repo to build your local kubeadm cluster https://github.com/CoyApilado18/Build-your-local-Kubernetes-cluster.git with one Controlplane and one Worker node. I used Ubuntu 22.04 for this project.
