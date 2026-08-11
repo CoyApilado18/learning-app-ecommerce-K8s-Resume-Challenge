@@ -16,7 +16,7 @@ This project documents my hands-on work with:
 ## High level Overview Diagram of the Ecommerce website 
 ![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ceeb4e79ac0c5b1f643d108ebba300812fbc90c4/docs/images/Diagram.png)  
 
-- Running Ecommerce website via (http://localhost:8080/)
+- Finish product output in your local machine, a running ecommerce website via (http://localhost:8080/) ready for deployment.
 ![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/a5b1a2265ea3c77e86bf1b4e2d75a91b605b8e21/docs/images/localhost-website-white-theme.png)  
 
 ## Documentation 
