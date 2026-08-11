@@ -2,7 +2,7 @@
 
 Welcome to my Kubernetes Resume Challenge documentation in reference to the link below. This is a sample e-commerce application written in PHP and uses MariaDB image for the database and this is built for learning purposes. This homelab is specially for someone new to containerized applications or, if you want a refresher with Docker containers and Kubernetes for container orchestration or, if you're a seasoned Devops practitioner, you'll still find this useful to build your K8s cluster for your homelab with minimum specification requirements. This hands-on challenge involves several technologies that you'll be exposed to; from source code version control using GitHub, deployment to cloud using AWS EKS and ECR for container registry and automating deployment via CI/CD through a pipeline using GitHub Actions. 
 
-[Reference URL:](https://cloudresumechallenge.dev/docs/extensions/kubernetes-challenge/?utm_source=substack&utm_medium=email#intro )
+Reference link [The Kubernetes Resume Challenge](https://cloudresumechallenge.dev/docs/extensions/kubernetes-challenge/?utm_source=substack&utm_medium=email#intro )
 
 This project documents my hands-on work with:  
 - Kubernetes cluster administration
