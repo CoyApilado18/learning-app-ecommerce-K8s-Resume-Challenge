@@ -14,7 +14,7 @@ This project documents my hands-on work with:
 - AWS EKS deployment and AWS ECR for container registry
 
 ## High level Overview Diagram of the Ecommerce website 
-![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/ceeb4e79ac0c5b1f643d108ebba300812fbc90c4/docs/images/Diagram.png)  
+![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/e1d3799b8c1d1fef4176fa6001508651068bc862/docs/images/Diagram.png)  
 
 - Finish product output in your local machine, a running ecommerce website via (http://localhost:8080/) ready for deployment.
 ![image alt](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/a5b1a2265ea3c77e86bf1b4e2d75a91b605b8e21/docs/images/localhost-website-white-theme.png)  
