@@ -2,13 +2,11 @@
 
 Welcome to my documentation of the Kubernetes challenge Extras -> [Implement Basic CI/CD Pipeline](https://cloudresumechallenge.dev/docs/extensions/kubernetes-challenge/?utm_source=substack&utm_medium=email#implement-basic-cicd-pipeline). This demo is for learning purposes only and a great way to gain a hands-on knowledge learning automation of deployments using GitHub Actions as your CI/CD Pipeline.
 
-Side Note: There's a containerized Ecommerce app that is part of this Kubernetes Challenge built for this CI/CD project -see my GitHub repo [learning-app-ecommerce-K8s-Resume-Challenge](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge.git) and this is what we will use for this CI/CD Pipeline project. Feel free to clone or fork my GitHub repo. It's a fully functional demo app where all the Kubernetes manifests are tested and ready for deployment to your Kubernetes cluster.   
-
 What's more, if you want to build your own local kubeadm homelab for your Kubernetes cluster with minimum spec requirements to test this out, feel free to clone or fork my GitHub repo [Build-your-local-Kubernetes-cluster](https://github.com/CoyApilado18/Build-your-local-Kubernetes-cluster.git). It's free and all open source. :)
 
 
 # Key Concepts of GitHub Actions
-GitHub Actions is GitHub’s built-in, event-driven automation engine that lets you define CI/CD (`Build-Test-Deploy`) pipelines and other repository workflows as YAML files, which run on hosted or self-hosted runners whenever specified GitHub events occur. 
+![GitHub Actions](https://github.com/features/actions) is GitHub’s built-in, event-driven automation engine that lets you define CI/CD (`Build-Test-Deploy`) pipelines and other repository workflows as YAML files, which run on hosted or self-hosted runners whenever specified GitHub events occur. 
 
 A workflow consists of:
 - Events: What starts the workflow, such as a push to main/master branch.
@@ -112,7 +110,9 @@ Value: <the_PAT_you_just_copied>
 
 (Optionally, you can use a variable for the username and a secret only for the token, but using both as secrets is common and simple.) 
 
-4. Use the token in a GitHub Actions workflow
+You will then use the token in a GitHub Actions workflow in `Login to Docker Hub` step. 
+
+5. Basic workflow: build & push on every push to both branches
 
 
 
