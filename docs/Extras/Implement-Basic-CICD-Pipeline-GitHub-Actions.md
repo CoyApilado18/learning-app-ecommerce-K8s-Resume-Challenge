@@ -6,14 +6,14 @@ What's more, if you want to build your own local kubeadm homelab for your Kubern
 
 
 # Key Concepts of GitHub Actions
-![GitHub Actions](https://github.com/features/actions) is GitHub’s built-in, event-driven automation engine that lets you define CI/CD (`Build-Test-Deploy`) pipelines and other repository workflows as YAML files, which run on hosted or self-hosted runners whenever specified GitHub events occur. 
+[GitHub Actions](https://github.com/features/actions) is GitHub’s built-in, event-driven automation engine that lets you define CI/CD (`Build-Test-Deploy`) pipelines and other repository workflows as YAML files, which run on hosted or self-hosted runners whenever specified GitHub events occur. 
 
-A workflow consists of:
-- Events: What starts the workflow, such as a push to main/master branch.
-- Jobs: Major units of work.
-- Runners: Temporary virtual machines that execute jobs.
-- Steps: Individual commands or reusable actions within a job.
-- Actions: Reusable automation components published by GitHub or other developers.
+A `workflow` consists of:
+- `Events`: What starts the workflow, such as a push to main/master branch.
+- `Jobs`: Major units of work.
+- `Runners`: Temporary virtual machines that execute jobs.
+- `Steps`: Individual commands or reusable actions within a job.
+- `Actions`: Reusable automation components published by GitHub or other developers.
 
 GitHub describes a `workflow` as one or more jobs, with each job containing a sequence of steps. Each step runs in the runner environment.
 
@@ -112,11 +112,113 @@ Value: <the_PAT_you_just_copied>
 
 You will then use the token in a GitHub Actions workflow in `Login to Docker Hub` step. 
 
-5. Basic workflow: build & push on every push to both branches
+4. Kubernetes requirements
+Before the deployment portion can work, Kubernetes must be reachable from the GitHub Actions runner.
+A local cluster running on your Ubuntu VM is not normally reachable from a GitHub-hosted runner. Therefore, you need one of these approaches:  
+1. A public cloud cluster such as EKS, GKE, or AKS.  
+2. A self-hosted GitHub Actions runner inside your network.  
+3. A securely exposed Kubernetes API endpoint.  
 
+We'll go with option 2 (A self-hosted GitHub Actions runner inside your network.) since I have my k8s cluster running on my local Ubuntu test environment. I will have a separate demo for option 1 -using a public cloud cluster AWS EKS. 
 
+5. Option 2 (A self-hosted GitHub Actions runner inside your network.) High-level overview:  
+5.1 Create a self-hosted runner on your Ubuntu VM.  
+5.2 Ensure the runner can:  
+- Run Docker (build/push images).
+- Run kubectl against your local cluster.
+5.3 Point your GitHub workflow to use this runner.  
+5.4 Test the full pipeline:  
+- Push to main → build image → push to Docker Hub → update local k8s Deployment.
 
+6. Prerequisites on your Ubuntu VM
+On the Ubuntu machine that hosts your k8s cluster, ensure you have:
+- Docker installed and working. Verify:
+```bash
+docker --version
+docker run hello-world
+```
+- `kubectl` configured and able to talk to your cluster. 
+```bash
+kubectl version --client
+kubectl get nodes
+kubectl get pods -A
+```
+- Network access to GitHub (HTTPS).
+- A user account that will run the runner (e.g. ubuntu or a dedicated runner user).  
 
+If `kubectl get nodes` works, your kubeconfig is already set up for that user.
 
+7. Create a self-hosted runner in GitHub
+Do this in your GitHub repo:
 
+Go to your repository on GitHub.
 
+Click Settings (top tab).
+
+In the left sidebar, click Actions → Runners.
+
+Click New self-hosted runner.
+
+Choose:
+
+OS: Linux
+
+Architecture: x64 (most likely for your Ubuntu VM)
+
+GitHub will show commands below, this is just a sample commands:
+```bash
+mkdir actions-runner && cd actions-runner
+curl -O -L https://github.com/actions/runner/releases/download/v2.322.0/actions-runner-linux-x64-2.322.0.tar.gz
+tar xzf actions-runner-linux-x64-2.322.0.tar.gz
+./config.sh --url https://github.com/YOUR-ORG/YOUR-REPO --token YOUR_TOKEN
+./run.sh
+```
+GitHub’s docs describe this exact process for registering a self-hosted runner.
+
+4. Install and configure the runner
+Run the commands GitHub gives you on your Ubuntu VM. 
+- Download:
+![alt image](selfhosted-runner-download-cmd.png)
+
+- Configure:
+![alt image](selfhosted-runner-configure-cmd.png)
+
+GitHub’s runner will now appear in Settings → Actions → Runners as “Online”.
+
+Then start the runner. Leave this running in a terminal
+```bash
+./run.sh
+```
+Or  
+Set it up as a `systemd service`. From the runner directory:
+```bash
+sudo ./svc.sh install
+sudo ./svc.sh start
+```
+Check status
+```bash
+sudo ./svc.sh status
+```
+
+8. Make sure the runner user can use Docker and kubectl
+The runner process runs as the user that started it. That user must:
+- Be able to run docker without `sudo`. [Docker without sudo](https://docs.docker.com/engine/install/linux-postinstall/)
+- Have a valid kubeconfig in `~/.kube/config`.
+
+kubectl access  
+- Ensure that when you run `kubectl get nodes` as the same user that will run the runner, it works.
+- If your kubeconfig is in a non-standard location, either:
+  - Move/copy it to ~/.kube/config, or  
+  - Set KUBECONFIG in your shell profile (e.g. ~/.bashrc): 
+  ```bash
+  export KUBECONFIG=/path/to/your/kubeconfig
+  ```
+  then reload:
+  ```bash
+  source ~/.bashrc
+  kubectl get nodes
+  ```
+
+The runner inherits this environment when started from an interactive shell. For a systemd service, you’ll set `Environment=`lines. 
+
+9. Update your workflow to use the self-hosted runner

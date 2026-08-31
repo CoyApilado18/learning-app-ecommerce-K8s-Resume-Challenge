@@ -1,3 +1,6 @@
 .DS_Store
 .idea/
 .bak
+actions-runner/
+# Local GitHub Actions self-hosted runner; never commit runner binaries or job workspaces
+/actions-runner/
