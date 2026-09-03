@@ -34,21 +34,23 @@ We will create GitHub Actions workflow that automatically:
 
 Automates the flow above:
 ```bash
-git push to main
+You edit code locally
         ↓
-GitHub Actions starts a temporary runner
+git push origin k8s-ecomwebapp
         ↓
-Checkout source code
+GitHub detects the push
         ↓
-Build Docker image
+GitHub assigns the job to your Ubuntu self-hosted runner
         ↓
-Log in to Docker Hub
+Runner checks out the pushed commit
         ↓
-Push image to Docker Hub
+Runner builds a Docker image
         ↓
-Update Kubernetes Deployment
+Runner pushes it to Docker Hub
         ↓
-Wait for rollout to complete
+Runner runs kubectl against your local cluster
+        ↓
+Kubernetes performs a rolling update
 ```
 
 For this challenge:
@@ -165,7 +167,10 @@ OS: Linux
 
 Architecture: x64 (most likely for your Ubuntu VM)
 
-GitHub will show commands below, this is just a sample commands:
+GitHub will show commands below, this is just a sample commands.
+
+NOTE: YOU SHOULD CREATE THE actions-runner/ OUTSIDE YOUR GIT PROJECT DIRECTORY. THE SELF-HOSTED RUNNER IS MACHINE INFRASTRUCTRUCTURE, NOT SOURCE CODE, SO IT SHOULD NOT LIVE INSIDE THE REPOSITORY YOU COMMIT AND PUSH. THIS DIRECTORY WILL CONTAIN LARGE FILES WHEN YOU THE RUNNER IS RUN AND WHEN YOU START RUNNING THE WORKFLOW.
+
 ```bash
 mkdir actions-runner && cd actions-runner
 curl -O -L https://github.com/actions/runner/releases/download/v2.322.0/actions-runner-linux-x64-2.322.0.tar.gz
@@ -175,13 +180,14 @@ tar xzf actions-runner-linux-x64-2.322.0.tar.gz
 ```
 GitHub’s docs describe this exact process for registering a self-hosted runner.
 
-4. Install and configure the runner
+8. Install and configure the runner
+
 Run the commands GitHub gives you on your Ubuntu VM. 
 - Download:
-![alt image](selfhosted-runner-download-cmd.png)
+![alt image](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/b9c2ad3fa61fc49e9769042b22ab99a70e12c424/docs/images/selfhosted-runner-download-cmd.png)
 
 - Configure:
-![alt image](selfhosted-runner-configure-cmd.png)
+![alt image](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/b9c2ad3fa61fc49e9769042b22ab99a70e12c424/docs/images/selfhosted-runner-configure-cmd.png.png)
 
 GitHub’s runner will now appear in Settings → Actions → Runners as “Online”.
 
@@ -190,7 +196,8 @@ Then start the runner. Leave this running in a terminal
 ./run.sh
 ```
 Or  
-Set it up as a `systemd service`. From the runner directory:
+Set it up as a `systemd service`.  
+From the runner directory:
 ```bash
 sudo ./svc.sh install
 sudo ./svc.sh start
@@ -200,7 +207,7 @@ Check status
 sudo ./svc.sh status
 ```
 
-8. Make sure the runner user can use Docker and kubectl
+9. Make sure the runner user can use Docker and kubectl
 The runner process runs as the user that started it. That user must:
 - Be able to run docker without `sudo`. [Docker without sudo](https://docs.docker.com/engine/install/linux-postinstall/)
 - Have a valid kubeconfig in `~/.kube/config`.
@@ -221,4 +228,3 @@ kubectl access
 
 The runner inherits this environment when started from an interactive shell. For a systemd service, you’ll set `Environment=`lines. 
 
-9. Update your workflow to use the self-hosted runner

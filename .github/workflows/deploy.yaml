@@ -1,73 +1,77 @@
-name: Build, Push and Update K8s Manifest
+name: Build and Deploy E-Commerce App
 
 on:
   push:
     branches:
       - k8s-ecomwebapp
-      - master
+
+  workflow_dispatch:
 
 env:
-  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-  IMAGE_NAME: ecom-web
-  MANIFEST_PATH: kubernetes/ecomwebapp/01-website-deployment.yaml
+  IMAGE_NAME: testyoc/ecom-web-helm-cicd-test
+  DEPLOYMENT_NAME: ecom-webapp
+  CONTAINER_NAME: ecom-webapp
+  KUBERNETES_NAMESPACE: cicd-test
 
 jobs:
-  build-push-update:
-    runs-on: ubuntu-latest
+  build-and-deploy:
+    name: Build, Push, and Deploy to Local Kubernetes
+    runs-on: [self-hosted, local-k8s]
 
     steps:
-      # 1. Checkout repo
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      # 2. Log in to Docker Hub
+      - name: Verify runner tools and cluster access
+        run: |
+          echo "Runner user: $(whoami)"
+          echo "Runner host: $(hostname)"
+          docker --version
+          kubectl version --client
+          kubectl get nodes
+          kubectl config current-context
+
+      - name: Create immutable image tag
+        id: image
+        shell: bash
+        run: |
+          echo "tag=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v4
         with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
-          password: ${{ env.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 3. Build and push Docker image
-      - name: Build and push Docker image
-        id: build
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push application image
         uses: docker/build-push-action@v7
         with:
           context: .
+          file: ./Dockerfile
           push: true
           tags: |
-            ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-            ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.image.outputs.tag }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
-      # 4. Update Kubernetes manifest with new image tag
-      - name: Update K8s manifest with new image
+      - name: Update Kubernetes Deployment
+        shell: bash
         run: |
-          NEW_IMAGE="${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
-          echo "Updating manifest to image: $NEW_IMAGE"
+          kubectl -n "${KUBERNETES_NAMESPACE}" set image \
+            deployment/"${DEPLOYMENT_NAME}" \
+            "${CONTAINER_NAME}"="${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${{ steps.image.outputs.tag }}"
 
-          # Use sed to replace the image line in the deployment YAML
-          # This assumes your YAML has a line like:
-          #   image: some-old-image:tag
-          # under spec.template.spec.containers
-          sed -i "s|image: .*|image: ${NEW_IMAGE}|g" "${{ env.MANIFEST_PATH }}"
-
-          # Show the diff for debugging
-          git diff "${{ env.MANIFEST_PATH }}"
-
-      # 5. Commit and push manifest change (GitOps-style)
-      - name: Commit and push manifest update
+      - name: Wait for Kubernetes rollout
+        shell: bash
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          kubectl -n "${KUBERNETES_NAMESPACE}" rollout status \
+            deployment/"${DEPLOYMENT_NAME}" \
+            --timeout=180s
 
-          git add "${{ env.MANIFEST_PATH }}"
-
-          # Only commit if there are changes
-          if ! git diff --staged --quiet; then
-            git commit -m "ci: update website image to ${{ github.sha }}"
-            git push
-          else
-            echo "No manifest changes to commit"
-          fi
+      - name: Show deployed image
+        shell: bash
+        run: |
+          kubectl -n "${KUBERNETES_NAMESPACE}" get deployment "${DEPLOYMENT_NAME}" \
+            -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
