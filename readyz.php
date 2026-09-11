@@ -1,5 +1,5 @@
 <?php
-$mysqli = @new mysqli("mysql-service.ecomwebapp.svc.cluster.local", "ecomuser", "ecompassword", "ecomdb");
+$mysqli = @new mysqli("mysql-service.cicd-test.svc.cluster.local", "ecomuser", "ecompassword", "ecomdb");
 
 if ($mysqli->connect_error) {
     http_response_code(503);
