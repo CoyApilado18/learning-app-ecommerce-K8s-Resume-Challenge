@@ -5,7 +5,6 @@ metadata:
   labels:
     app: ecom-webapp
   name: ecom-web-svc
-  namespace: ecomwebapp
 spec:
   ports:
   - port: 80

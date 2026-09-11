@@ -5,7 +5,6 @@ metadata:
   labels:
     app: ecom-webapp
   name: ecom-webapp
-  namespace: ecomwebapp
 spec:
   replicas: 2
   selector:

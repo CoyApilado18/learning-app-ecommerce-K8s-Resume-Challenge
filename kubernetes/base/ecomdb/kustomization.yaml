@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - 02-db-credentials.yaml
+  - 03-db-init-cm.yaml
+  - 04-db-app-config.yaml
+#  - 05-db-pv-pvc.yaml - This is commented out because the PV and PVC are now being created in the overlay for the cicd-test environment. The base should stay generic, while the cicd-test overlay contains the unique PV/PVC resource and the Deployment patch. PV/PVC are specific to "per" environment.
+  - 06-db-mysql-deploy.yaml
+  - 07-db-mysql-service.yaml
+  - 08-db-init-job.yaml

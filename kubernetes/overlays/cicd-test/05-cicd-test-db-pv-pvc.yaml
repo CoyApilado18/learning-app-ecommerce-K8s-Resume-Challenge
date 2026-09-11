@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mysql-pv-cicd
+  name: cicd-test-mysql-pv
 spec:
   capacity:
     storage: 2Gi
@@ -10,16 +10,17 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: manual
   hostPath:
-    path: /mnt/data/mysql
+    path: /mnt/data/cicd-test-mysql
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pvc-cicd
+  name: cicd-test-mysql-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: manual
+  volumeName: cicd-test-mysql-pv
   resources:
     requests:
       storage: 2Gi

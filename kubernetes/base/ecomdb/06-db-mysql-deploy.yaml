@@ -4,7 +4,6 @@ metadata:
   labels:
     app: mysql
   name: mysql
-  namespace: ecomwebapp
 spec:
   replicas: 1
   selector:

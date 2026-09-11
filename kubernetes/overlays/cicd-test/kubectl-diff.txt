@@ -1,0 +1,517 @@
+diff -u -N /tmp/LIVE-156714208/apps.v1.Deployment.cicd-test.ecom-webapp /tmp/MERGED-2339250999/apps.v1.Deployment.cicd-test.ecom-webapp
+--- /tmp/LIVE-156714208/apps.v1.Deployment.cicd-test.ecom-webapp	2026-09-09 01:10:11.847911070 -0500
++++ /tmp/MERGED-2339250999/apps.v1.Deployment.cicd-test.ecom-webapp	2026-09-09 01:10:11.849911430 -0500
+@@ -0,0 +1,101 @@
++apiVersion: apps/v1
++kind: Deployment
++metadata:
++  creationTimestamp: "2026-09-09T06:10:11Z"
++  generation: 1
++  labels:
++    app: ecom-webapp
++  name: ecom-webapp
++  namespace: cicd-test
++  uid: 3f6f8ca8-b3ad-43d6-a231-881180bd6f66
++spec:
++  progressDeadlineSeconds: 600
++  replicas: 2
++  revisionHistoryLimit: 10
++  selector:
++    matchLabels:
++      app: ecom-webapp
++  strategy:
++    rollingUpdate:
++      maxSurge: 1
++      maxUnavailable: 0
++    type: RollingUpdate
++  template:
++    metadata:
++      creationTimestamp: null
++      labels:
++        app: ecom-webapp
++    spec:
++      containers:
++      - env:
++        - name: DB_HOST
++          valueFrom:
++            configMapKeyRef:
++              key: DB_HOST
++              name: app-config
++        - name: DB_NAME
++          valueFrom:
++            configMapKeyRef:
++              key: DB_NAME
++              name: app-config
++        - name: FEATURE_DARK_MODE
++          valueFrom:
++            configMapKeyRef:
++              key: FEATURE_DARK_MODE
++              name: app-config
++        - name: DB_USER
++          valueFrom:
++            secretKeyRef:
++              key: username
++              name: db-credentials
++        - name: DB_PASSWORD
++          valueFrom:
++            secretKeyRef:
++              key: password
++              name: db-credentials
++        - name: MARIADB_ROOT_PASSWORD
++          valueFrom:
++            secretKeyRef:
++              key: rootpassword
++              name: db-credentials
++        image: testyoc/ecom-web-cicd-test:placeholder
++        imagePullPolicy: IfNotPresent
++        livenessProbe:
++          failureThreshold: 3
++          httpGet:
++            path: /healthz.php
++            port: 80
++            scheme: HTTP
++          initialDelaySeconds: 15
++          periodSeconds: 10
++          successThreshold: 1
++          timeoutSeconds: 2
++        name: ecom-webapp
++        ports:
++        - containerPort: 80
++          protocol: TCP
++        readinessProbe:
++          failureThreshold: 6
++          httpGet:
++            path: /readyz.php
++            port: 80
++            scheme: HTTP
++          initialDelaySeconds: 10
++          periodSeconds: 5
++          successThreshold: 1
++          timeoutSeconds: 5
++        resources:
++          limits:
++            cpu: 200m
++            memory: 256Mi
++          requests:
++            cpu: 100m
++            memory: 128Mi
++        terminationMessagePath: /dev/termination-log
++        terminationMessagePolicy: File
++      dnsPolicy: ClusterFirst
++      restartPolicy: Always
++      schedulerName: default-scheduler
++      securityContext: {}
++      terminationGracePeriodSeconds: 30
++status: {}
+diff -u -N /tmp/LIVE-156714208/apps.v1.Deployment.cicd-test.mysql /tmp/MERGED-2339250999/apps.v1.Deployment.cicd-test.mysql
+--- /tmp/LIVE-156714208/apps.v1.Deployment.cicd-test.mysql	2026-09-09 01:10:11.901920775 -0500
++++ /tmp/MERGED-2339250999/apps.v1.Deployment.cicd-test.mysql	2026-09-09 01:10:11.901920775 -0500
+@@ -0,0 +1,101 @@
++apiVersion: apps/v1
++kind: Deployment
++metadata:
++  creationTimestamp: "2026-09-09T06:10:11Z"
++  generation: 1
++  labels:
++    app: mysql
++  name: mysql
++  namespace: cicd-test
++  uid: d20d21d7-e41a-4ee5-b401-c12ccc2ce2f1
++spec:
++  progressDeadlineSeconds: 600
++  replicas: 1
++  revisionHistoryLimit: 10
++  selector:
++    matchLabels:
++      app: mysql
++  strategy:
++    rollingUpdate:
++      maxSurge: 25%
++      maxUnavailable: 25%
++    type: RollingUpdate
++  template:
++    metadata:
++      creationTimestamp: null
++      labels:
++        app: mysql
++    spec:
++      containers:
++      - env:
++        - name: MYSQL_DATABASE
++          value: ecomdb
++        - name: MYSQL_USER
++          valueFrom:
++            secretKeyRef:
++              key: username
++              name: db-credentials
++        - name: MYSQL_PASSWORD
++          valueFrom:
++            secretKeyRef:
++              key: password
++              name: db-credentials
++        - name: MARIADB_ROOT_PASSWORD
++          valueFrom:
++            secretKeyRef:
++              key: rootpassword
++              name: db-credentials
++        image: mariadb:10.5
++        imagePullPolicy: IfNotPresent
++        livenessProbe:
++          exec:
++            command:
++            - sh
++            - -c
++            - mysqladmin ping -h 127.0.0.1 -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" --silent
++          failureThreshold: 3
++          initialDelaySeconds: 30
++          periodSeconds: 10
++          successThreshold: 1
++          timeoutSeconds: 5
++        name: mariadb
++        ports:
++        - containerPort: 3306
++          protocol: TCP
++        readinessProbe:
++          exec:
++            command:
++            - sh
++            - -c
++            - mysqladmin ping -h 127.0.0.1 -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" --silent
++          failureThreshold: 6
++          initialDelaySeconds: 5
++          periodSeconds: 5
++          successThreshold: 1
++          timeoutSeconds: 3
++        resources: {}
++        startupProbe:
++          exec:
++            command:
++            - sh
++            - -c
++            - mysqladmin ping -h 127.0.0.1 -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" --silent
++          failureThreshold: 60
++          periodSeconds: 5
++          successThreshold: 1
++          timeoutSeconds: 3
++        terminationMessagePath: /dev/termination-log
++        terminationMessagePolicy: File
++        volumeMounts:
++        - mountPath: /var/lib/mysql
++          name: mysql-persistent-storage
++      dnsPolicy: ClusterFirst
++      restartPolicy: Always
++      schedulerName: default-scheduler
++      securityContext: {}
++      terminationGracePeriodSeconds: 30
++      volumes:
++      - name: mysql-persistent-storage
++        persistentVolumeClaim:
++          claimName: cicd-test-mysql-pvc
++status: {}
+diff -u -N /tmp/LIVE-156714208/autoscaling.v1.HorizontalPodAutoscaler.cicd-test.ecom-webapp-hpa /tmp/MERGED-2339250999/autoscaling.v1.HorizontalPodAutoscaler.cicd-test.ecom-webapp-hpa
+--- /tmp/LIVE-156714208/autoscaling.v1.HorizontalPodAutoscaler.cicd-test.ecom-webapp-hpa	2026-09-09 01:10:11.914923111 -0500
++++ /tmp/MERGED-2339250999/autoscaling.v1.HorizontalPodAutoscaler.cicd-test.ecom-webapp-hpa	2026-09-09 01:10:11.915923291 -0500
+@@ -0,0 +1,18 @@
++apiVersion: autoscaling/v1
++kind: HorizontalPodAutoscaler
++metadata:
++  creationTimestamp: "2026-09-09T06:10:11Z"
++  name: ecom-webapp-hpa
++  namespace: cicd-test
++  uid: 8db45748-ceb3-423b-8bd8-297a4f65e4d7
++spec:
++  maxReplicas: 10
++  minReplicas: 2
++  scaleTargetRef:
++    apiVersion: apps/v1
++    kind: Deployment
++    name: ecom-webapp
++  targetCPUUtilizationPercentage: 50
++status:
++  currentReplicas: 0
++  desiredReplicas: 0
+diff -u -N /tmp/LIVE-156714208/batch.v1.Job.cicd-test.db-init-job /tmp/MERGED-2339250999/batch.v1.Job.cicd-test.db-init-job
+--- /tmp/LIVE-156714208/batch.v1.Job.cicd-test.db-init-job	2026-09-09 01:10:11.943928323 -0500
++++ /tmp/MERGED-2339250999/batch.v1.Job.cicd-test.db-init-job	2026-09-09 01:10:11.943928323 -0500
+@@ -0,0 +1,96 @@
++apiVersion: batch/v1
++kind: Job
++metadata:
++  creationTimestamp: "2026-09-09T06:10:11Z"
++  generation: 1
++  labels:
++    app: db-init
++    batch.kubernetes.io/controller-uid: e5c2abd2-51d6-4e8e-ad83-fdf57184f144
++    batch.kubernetes.io/job-name: db-init-job
++    controller-uid: e5c2abd2-51d6-4e8e-ad83-fdf57184f144
++    job-name: db-init-job
++  name: db-init-job
++  namespace: cicd-test
++  uid: e5c2abd2-51d6-4e8e-ad83-fdf57184f144
++spec:
++  backoffLimit: 4
++  completionMode: NonIndexed
++  completions: 1
++  manualSelector: false
++  parallelism: 1
++  podReplacementPolicy: TerminatingOrFailed
++  selector:
++    matchLabels:
++      batch.kubernetes.io/controller-uid: e5c2abd2-51d6-4e8e-ad83-fdf57184f144
++  suspend: false
++  template:
++    metadata:
++      creationTimestamp: null
++      labels:
++        app: db-init
++        batch.kubernetes.io/controller-uid: e5c2abd2-51d6-4e8e-ad83-fdf57184f144
++        batch.kubernetes.io/job-name: db-init-job
++        controller-uid: e5c2abd2-51d6-4e8e-ad83-fdf57184f144
++        job-name: db-init-job
++    spec:
++      containers:
++      - command:
++        - sh
++        - -c
++        - |
++          echo "Waiting for database..."
++          until mysqladmin ping -h"${DB_HOST}" -u"${DB_USER}" -p"${DB_PASSWORD}" --silent; do
++            sleep 2
++          done
++
++          echo "Running db-load-script.sql..."
++          mysql -h"${DB_HOST}" \
++                -u"${DB_USER}" \
++                -p"${DB_PASSWORD}" \
++                "${DB_NAME}" < /scripts/db-load-script.sql
++        env:
++        - name: DB_HOST
++          valueFrom:
++            configMapKeyRef:
++              key: DB_HOST
++              name: app-config
++        - name: DB_NAME
++          valueFrom:
++            configMapKeyRef:
++              key: DB_NAME
++              name: app-config
++        - name: DB_USER
++          valueFrom:
++            secretKeyRef:
++              key: username
++              name: db-credentials
++        - name: DB_PASSWORD
++          valueFrom:
++            secretKeyRef:
++              key: password
++              name: db-credentials
++        image: mysql:8.0
++        imagePullPolicy: IfNotPresent
++        name: db-init
++        resources: {}
++        terminationMessagePath: /dev/termination-log
++        terminationMessagePolicy: File
++        volumeMounts:
++        - mountPath: /scripts/db-load-script.sql
++          name: db-init-script
++          readOnly: true
++          subPath: db-load-script.sql
++      dnsPolicy: ClusterFirst
++      restartPolicy: OnFailure
++      schedulerName: default-scheduler
++      securityContext: {}
++      terminationGracePeriodSeconds: 30
++      volumes:
++      - configMap:
++          defaultMode: 420
++          items:
++          - key: db-load-script.sql
++            path: db-load-script.sql
++          name: db-init-cm
++        name: db-init-script
++status: {}
+diff -u -N /tmp/LIVE-156714208/v1.ConfigMap.cicd-test.app-config /tmp/MERGED-2339250999/v1.ConfigMap.cicd-test.app-config
+--- /tmp/LIVE-156714208/v1.ConfigMap.cicd-test.app-config	2026-09-09 01:10:11.625871173 -0500
++++ /tmp/MERGED-2339250999/v1.ConfigMap.cicd-test.app-config	2026-09-09 01:10:11.625871173 -0500
+@@ -0,0 +1,11 @@
++apiVersion: v1
++data:
++  DB_HOST: mysql-service
++  DB_NAME: ecomdb
++  FEATURE_DARK_MODE: "false"
++kind: ConfigMap
++metadata:
++  creationTimestamp: "2026-09-09T06:10:11Z"
++  name: app-config
++  namespace: cicd-test
++  uid: 94d558e0-81fd-4555-9685-29596a98fde1
+diff -u -N /tmp/LIVE-156714208/v1.ConfigMap.cicd-test.db-init-cm /tmp/MERGED-2339250999/v1.ConfigMap.cicd-test.db-init-cm
+--- /tmp/LIVE-156714208/v1.ConfigMap.cicd-test.db-init-cm	2026-09-09 01:10:11.664878182 -0500
++++ /tmp/MERGED-2339250999/v1.ConfigMap.cicd-test.db-init-cm	2026-09-09 01:10:11.670879260 -0500
+@@ -0,0 +1,34 @@
++apiVersion: v1
++data:
++  db-load-script.sql: |
++    CREATE DATABASE IF NOT EXISTS ecomdb;
++        USE ecomdb;
++
++        CREATE TABLE IF NOT EXISTS Products (
++        id MEDIUMINT(8) UNSIGNED NOT NULL AUTO_INCREMENT,
++        Name VARCHAR(255) DEFAULT NULL,
++        Price VARCHAR(255) DEFAULT NULL,
++        ImageUrl VARCHAR(255) DEFAULT NULL,
++        PRIMARY KEY (id),
++        UNIQUE KEY uq_products_name_imageurl (Name, ImageUrl)
++        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
++
++        INSERT INTO Products (Name, Price, ImageUrl)
++        VALUES
++        ('Laptop', '100', 'c-1.png'),
++        ('Drone', '200', 'c-2.png'),
++        ('VR', '300', 'c-3.png'),
++        ('Tablet', '50', 'c-5.png'),
++        ('Watch', '90', 'c-6.png'),
++        ('Phone Covers', '20', 'c-7.png'),
++        ('Phone', '80', 'c-8.png'),
++        ('Laptop', '150', 'c-4.png')
++        ON DUPLICATE KEY UPDATE
++        Price = VALUES(Price),
++        ImageUrl = VALUES(ImageUrl);
++kind: ConfigMap
++metadata:
++  creationTimestamp: "2026-09-09T06:10:11Z"
++  name: db-init-cm
++  namespace: cicd-test
++  uid: b29012af-f05d-448f-bc13-3ac0bdd5af3e
+diff -u -N /tmp/LIVE-156714208/v1.PersistentVolume..cicd-test-mysql-pv /tmp/MERGED-2339250999/v1.PersistentVolume..cicd-test-mysql-pv
+--- /tmp/LIVE-156714208/v1.PersistentVolume..cicd-test-mysql-pv	2026-09-09 01:10:11.794901545 -0500
++++ /tmp/MERGED-2339250999/v1.PersistentVolume..cicd-test-mysql-pv	2026-09-09 01:10:11.795901725 -0500
+@@ -0,0 +1,22 @@
++apiVersion: v1
++kind: PersistentVolume
++metadata:
++  creationTimestamp: "2026-09-09T06:10:11Z"
++  finalizers:
++  - kubernetes.io/pv-protection
++  name: cicd-test-mysql-pv
++  uid: 27415630-775e-4312-bd45-3b82f7d33d94
++spec:
++  accessModes:
++  - ReadWriteOnce
++  capacity:
++    storage: 2Gi
++  hostPath:
++    path: /mnt/data/cicd-test-mysql
++    type: ""
++  persistentVolumeReclaimPolicy: Retain
++  storageClassName: manual
++  volumeMode: Filesystem
++status:
++  lastPhaseTransitionTime: "2026-09-09T06:10:11Z"
++  phase: Pending
+diff -u -N /tmp/LIVE-156714208/v1.PersistentVolumeClaim.cicd-test.cicd-test-mysql-pvc /tmp/MERGED-2339250999/v1.PersistentVolumeClaim.cicd-test.cicd-test-mysql-pvc
+--- /tmp/LIVE-156714208/v1.PersistentVolumeClaim.cicd-test.cicd-test-mysql-pvc	2026-09-09 01:10:11.825907116 -0500
++++ /tmp/MERGED-2339250999/v1.PersistentVolumeClaim.cicd-test.cicd-test-mysql-pvc	2026-09-09 01:10:11.826907296 -0500
+@@ -0,0 +1,20 @@
++apiVersion: v1
++kind: PersistentVolumeClaim
++metadata:
++  creationTimestamp: "2026-09-09T06:10:11Z"
++  finalizers:
++  - kubernetes.io/pvc-protection
++  name: cicd-test-mysql-pvc
++  namespace: cicd-test
++  uid: 4afc809c-684f-4028-870d-3069cfc77809
++spec:
++  accessModes:
++  - ReadWriteOnce
++  resources:
++    requests:
++      storage: 2Gi
++  storageClassName: manual
++  volumeMode: Filesystem
++  volumeName: cicd-test-mysql-pv
++status:
++  phase: Pending
+diff -u -N /tmp/LIVE-156714208/v1.Secret.cicd-test.db-credentials /tmp/MERGED-2339250999/v1.Secret.cicd-test.db-credentials
+--- /tmp/LIVE-156714208/v1.Secret.cicd-test.db-credentials	2026-09-09 01:10:11.710886449 -0500
++++ /tmp/MERGED-2339250999/v1.Secret.cicd-test.db-credentials	2026-09-09 01:10:11.710886449 -0500
+@@ -1 +1,12 @@
+-null
++apiVersion: v1
++data:
++  password: '***'
++  rootpassword: '***'
++  username: '***'
++kind: Secret
++metadata:
++  creationTimestamp: "2026-09-09T06:10:11Z"
++  name: db-credentials
++  namespace: cicd-test
++  uid: 74ad80d3-6f2f-4a23-a5cb-7c352c6c791d
++type: Opaque
+diff -u -N /tmp/LIVE-156714208/v1.Service.cicd-test.ecom-web-svc /tmp/MERGED-2339250999/v1.Service.cicd-test.ecom-web-svc
+--- /tmp/LIVE-156714208/v1.Service.cicd-test.ecom-web-svc	2026-09-09 01:10:11.738891481 -0500
++++ /tmp/MERGED-2339250999/v1.Service.cicd-test.ecom-web-svc	2026-09-09 01:10:11.738891481 -0500
+@@ -0,0 +1,30 @@
++apiVersion: v1
++kind: Service
++metadata:
++  creationTimestamp: "2026-09-09T06:10:11Z"
++  labels:
++    app: ecom-webapp
++  name: ecom-web-svc
++  namespace: cicd-test
++  uid: 26bc1c8f-70aa-418b-ba06-55e18cf0f8de
++spec:
++  allocateLoadBalancerNodePorts: true
++  clusterIP: 10.96.0.0
++  clusterIPs:
++  - 10.96.0.0
++  externalTrafficPolicy: Cluster
++  internalTrafficPolicy: Cluster
++  ipFamilies:
++  - IPv4
++  ipFamilyPolicy: SingleStack
++  ports:
++  - nodePort: 32769
++    port: 80
++    protocol: TCP
++    targetPort: 80
++  selector:
++    app: ecom-webapp
++  sessionAffinity: None
++  type: LoadBalancer
++status:
++  loadBalancer: {}
+diff -u -N /tmp/LIVE-156714208/v1.Service.cicd-test.mysql-service /tmp/MERGED-2339250999/v1.Service.cicd-test.mysql-service
+--- /tmp/LIVE-156714208/v1.Service.cicd-test.mysql-service	2026-09-09 01:10:11.769897052 -0500
++++ /tmp/MERGED-2339250999/v1.Service.cicd-test.mysql-service	2026-09-09 01:10:11.774897951 -0500
+@@ -0,0 +1,27 @@
++apiVersion: v1
++kind: Service
++metadata:
++  creationTimestamp: "2026-09-09T06:10:11Z"
++  labels:
++    app: mysql
++  name: mysql-service
++  namespace: cicd-test
++  uid: 191e45ff-c3e2-4745-bdc4-211e8a8baa95
++spec:
++  clusterIP: 10.96.0.0
++  clusterIPs:
++  - 10.96.0.0
++  internalTrafficPolicy: Cluster
++  ipFamilies:
++  - IPv4
++  ipFamilyPolicy: SingleStack
++  ports:
++  - port: 3306
++    protocol: TCP
++    targetPort: 3306
++  selector:
++    app: mysql
++  sessionAffinity: None
++  type: ClusterIP
++status:
++  loadBalancer: {}

@@ -28,6 +28,4 @@ data:
         ImageUrl = VALUES(ImageUrl);
 kind: ConfigMap
 metadata:
-  creationTimestamp: null
   name: db-init-cm
-  namespace: ecomwebapp

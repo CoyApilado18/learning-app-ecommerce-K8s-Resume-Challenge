@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+  - namespace.yaml
+  - 05-cicd-test-db-pv-pvc.yaml
+
+
+namespace: cicd-test
+
+
+images: 
+  - name: testyoc/ecomwebapp
+    newName: testyoc/ecom-web-cicd-test
+    newTag: placeholder
+
+patches:
+  - path: webapp-patch.yaml
+  - path: db-mysql-deploy-patch.yaml
+  - path: app-configmap-patch.yaml
+  
