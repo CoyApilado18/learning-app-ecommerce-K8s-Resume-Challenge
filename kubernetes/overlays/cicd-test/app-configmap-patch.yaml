@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: app-config
 data:
-  DB_HOST: "mysql-service.cicd-test.svc.cluster.local"
+  DB_HOST: "mysql-service"
