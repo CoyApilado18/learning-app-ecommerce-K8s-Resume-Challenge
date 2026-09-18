@@ -25,10 +25,10 @@ jobs:
       - name: Check out repository # Check out the repository.
         uses: actions/checkout@v4
 
-      - name: Verify runner tools and cluster access # Verify Docker, kubectl, and cluster access.
+      - name: Verify runner tools and cluster access # Verify Docker, kubectl, and cluster access. `set -euo pipefail` is a safety guard: it stops the script on any error, treats unset variables as errors, and fails if a command in a pipeline fails.
         shell: bash
         run: |
-          set -euo pipefail
+          set -euo pipefail 
           echo "Runner user: $(whoami)"
           echo "Runner host: $(hostname)"
           docker --version
