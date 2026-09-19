@@ -1,9 +1,19 @@
 # Introduction  
 
-Welcome to my documentation of the Kubernetes challenge Extras -> [Implement Basic CI/CD Pipeline](https://cloudresumechallenge.dev/docs/extensions/kubernetes-challenge/?utm_source=substack&utm_medium=email#implement-basic-cicd-pipeline). This demo is for learning purposes only and a great way to gain a hands-on knowledge learning automation of deployments using GitHub Actions as your CI/CD Pipeline.
+Welcome to my documentation of the Kubernetes challenge Extras -> [Implement-Basic-CICD-Pipeline-GitHub-Actions-Docker-Hub-Kustomize](https://cloudresumechallenge.dev/docs/extensions/kubernetes-challenge/?utm_source=substack&utm_medium=email#implement-basic-cicd-pipeline). This demo is for learning purposes only and a great way to gain a hands-on knowledge learning automation of deployments using GitHub Actions as your CI/CD Pipeline.
 
 What's more, if you want to build your own local kubeadm homelab for your Kubernetes cluster with minimum spec requirements to test this out, feel free to clone or fork my GitHub repo [Build-your-local-Kubernetes-cluster](https://github.com/CoyApilado18/Build-your-local-Kubernetes-cluster.git). It's free and all open source. :)
 
+# Overview
+This project implements the Basic CI/CD Pipeline portion of the Kubernetes Resume Challenge using GitHub Actions, Docker Hub, a self-hosted GitHub Actions runner, and Kustomize.
+The pipeline is intentionally deployed to an isolated local Kubernetes environment:
+Git branch:         cicd-kustomize
+Kubernetes namespace: cicd-test
+Container registry:  Docker Hub
+Runner location:     Local Ubuntu Kubernetes control-plane/test machine
+Deployment method:   Kustomize + `kubectl apply -k`
+
+This approach preserves the existing Helm-managed environment in the `helm` namespace while providing a separate environment for CI/CD testing and learning. Checkout my github repo for [Helm](https://github.com/CoyApilado18/k8s-Helm).
 
 # Key Concepts of GitHub Actions
 [GitHub Actions](https://github.com/features/actions) is GitHub’s built-in, event-driven automation engine that lets you define CI/CD (`Build-Test-Deploy`) pipelines and other repository workflows as YAML files, which run on hosted or self-hosted runners whenever specified GitHub events occur. 
@@ -23,70 +33,76 @@ GitHub describes a `workflow` as one or more jobs, with each job containing a se
 
 # Context 
 On this project, we will automate the build and deployment process using GitHub Actions.
-We will create GitHub Actions workflow that automatically:
-- Runs when code is pushed to main.
-- Checks out our repository.
-- Builds our ecommerce Docker image.
-- Login to Docker Hub (as Container Registry).
-- Pushes the image to Docker Hub.
-- Updates your Kubernetes deployment to use the new image.
-- Waits until Kubernetes confirms the rollout succeeded.  
+We will create GitHub Actions workflow that automates everything according to the architecture below.  
 
-Automates the flow above:
+Architecture
 ```bash
-You edit code locally
-        ↓
-git push origin k8s-ecomwebapp
-        ↓
-GitHub detects the push
-        ↓
-GitHub assigns the job to your Ubuntu self-hosted runner
-        ↓
-Runner checks out the pushed commit
-        ↓
-Runner builds a Docker image
-        ↓
-Runner pushes it to Docker Hub
-        ↓
-Runner runs kubectl against your local cluster
-        ↓
-Kubernetes performs a rolling update
+Developer pushes code to cicd-kustomize
+                 |
+GitHub Actions workflow starts
+                 |
+Self-hosted runner on local Ubuntu machine receives job
+                 |
+Checkout repository source and Kubernetes manifests
+                 |
+Build Docker image with Docker Buildx
+                 |
+Push commit-tagged image and latest image to Docker Hub
+                 |
+Create temporary copy of Kustomize manifests
+                 |
+Replace image placeholder with current Git commit SHA
+                 |
+Render and server-side validate Kustomize configuration
+                 |
+                 
+Delete previous database initialization Job
+                 |
+kubectl apply -k to cicd-test overlay
+                 |
+Wait for MySQL, web application, and database initialization Job
+
 ```
 
-For this challenge:
-- Continuous Integration (CI), means building and validating your Docker image.
-- Continuous Delivery/Deployment (CD), means pushing the image and deploying it to Kubernetes.
+# Why a self-hosted runner
+The Kubernetes cluster runs locally on an Ubuntu test machine. A GitHub-hosted runner cannot normally access a Kubernetes API server running only inside a local/private network.
+A self-hosted runner solves this by running the GitHub Actions job on the same Ubuntu machine that already has access to:
+• The local Docker daemon.
+• kubectl.
+• The Kubernetes kubeconfig.
+• The local Kubernetes control plane.
+• The private network where the test cluster runs.
+The workflow uses these runner labels:
+`runs-on: [self-hosted, local-k8s]`
+
+`self-hosted` identifies a runner managed locally instead of a GitHub-hosted virtual machine. 
+`local-k8s` is a custom label used to ensure this workflow is routed to the local Kubernetes-capable runner.
 
 # Goal
-- GitHub Actions Workflow: Create a `.github/workflows/deploy.yml` file to build the Docker image, push it to Docker Hub, and update the Kubernetes deployment upon push to the main branch.
-- Outcome: Changes to the application are automatically built and deployed, showcasing an efficient CI/CD pipeline.
+This implementation satisfies the core CI/CD goal:
+```bash
+Push to Git branch
+        |
+        v
+GitHub Actions runs on local self-hosted runner
+        |
+        v
+Docker image is built and pushed to Docker Hub
+        |
+        v
+Kustomize renders the cicd-test environment with an immutable commit image tag
+        |
+        v
+Kubernetes resources are applied and verified automatically
+```
+
+The result is an isolated, repeatable local Kubernetes CI/CD environment that demonstrates container image automation, Docker Hub integration, Kustomize overlays, static persistent storage, Kubernetes rollout validation, and GitHub Actions self-hosted runner usage.
+
 
 
 # Commands and Notes
-Repository structure: 
-```bash 
-our-repository/
-├── .github/
-│   └── workflows/
-│       └── deploy.yml
-├── Dockerfile
-├── application-source/
-├── kubernetes/
-│   └── ecomdb/
-│       └── ecomdb.yaml files
-│   └── ecomwebapp/
-│       └── ecomwebapp.yaml files
-└── README.md
-```
 
-1. Create workflow  
-- The workflow must be located at `.github/workflows`. GitHub automatically discovers workflow yaml files in this directory. Create the directory and create the `deploy.yaml` file where we will define the job to automate our CI/CD
-```bash
-mkdir -p .github/workflows/
-touch .github/workflows/deploy.yaml
-```
-
-2. DockerHub Preparation
+### DockerHub Preparation
 - Create a Docker Hub repository. ![Create a repository](https://docs.docker.com/docker-hub/repos/create/). I have an existing repo and named it `ecomwwebapp`. So my final image name is `testyoc/ecomwebapp`. 
 
 - Create a Docker Hub access token  
@@ -98,7 +114,7 @@ You will use that token as a GitHub repository secret. Docker specifically docum
  - `Access` push image to your own repo enable `Read & Write`. If you only need to pull, `Read` would be enough; for CI that builds and pushes, you need `Write`.  
  - Click `Generate` then copy the token immediately as you cannot view it again. Treat this token like a password. You’ll store it in GitHub Secrets, not in your repo.  
 
-3. Store the token in GitHub repository secrets
+### Store the token in GitHub repository secrets
 In your GitHub repo:  
 Go to `Settings` → `Secrets and variables` → `Actions`.  
 Under Repository secrets, click New repository secret.
@@ -114,25 +130,15 @@ Value: <the_PAT_you_just_copied>
 
 You will then use the token in a GitHub Actions workflow in `Login to Docker Hub` step. 
 
-4. Kubernetes requirements
-Before the deployment portion can work, Kubernetes must be reachable from the GitHub Actions runner.
-A local cluster running on your Ubuntu VM is not normally reachable from a GitHub-hosted runner. Therefore, you need one of these approaches:  
-1. A public cloud cluster such as EKS, GKE, or AKS.  
-2. A self-hosted GitHub Actions runner inside your network.  
-3. A securely exposed Kubernetes API endpoint.  
-
-We'll go with option 2 (A self-hosted GitHub Actions runner inside your network.) since I have my k8s cluster running on my local Ubuntu test environment. I will have a separate demo for option 1 -using a public cloud cluster AWS EKS. 
-
-5. Option 2 (A self-hosted GitHub Actions runner inside your network.) High-level overview:  
-5.1 Create a self-hosted runner on your Ubuntu VM.  
-5.2 Ensure the runner can:  
+### Create a self-hosted runner on your Ubuntu VM.  
+Ensure the runner can:  
 - Run Docker (build/push images).
 - Run kubectl against your local cluster.
-5.3 Point your GitHub workflow to use this runner.  
-5.4 Test the full pipeline:  
-- Push to main → build image → push to Docker Hub → update local k8s Deployment.
+- Point your GitHub workflow to use this runner.  
+- Test the full pipeline:  
+`Push to main → build image → push to Docker Hub → update local k8s Deployment.`
 
-6. Prerequisites on your Ubuntu VM
+### Prerequisites on your Ubuntu VM
 On the Ubuntu machine that hosts your k8s cluster, ensure you have:
 - Docker installed and working. Verify:
 ```bash
@@ -150,7 +156,7 @@ kubectl get pods -A
 
 If `kubectl get nodes` works, your kubeconfig is already set up for that user.
 
-7. Create a self-hosted runner in GitHub
+### Create a self-hosted runner in GitHub
 Do this in your GitHub repo:
 
 Go to your repository on GitHub.
@@ -169,7 +175,7 @@ Architecture: x64 (most likely for your Ubuntu VM)
 
 GitHub will show commands below, this is just a sample commands.
 
-NOTE: YOU SHOULD CREATE THE actions-runner/ OUTSIDE YOUR GIT PROJECT DIRECTORY. THE SELF-HOSTED RUNNER IS MACHINE INFRASTRUCTRUCTURE, NOT SOURCE CODE, SO IT SHOULD NOT LIVE INSIDE THE REPOSITORY YOU COMMIT AND PUSH. THIS DIRECTORY WILL CONTAIN LARGE FILES WHEN YOU THE RUNNER IS RUN AND WHEN YOU START RUNNING THE WORKFLOW.
+NOTE: YOU SHOULD CREATE THE actions-runner/ OUTSIDE YOUR GIT PROJECT DIRECTORY. THE SELF-HOSTED RUNNER IS MACHINE INFRASTRUCTRUCTURE, NOT SOURCE CODE, SO IT SHOULD NOT LIVE INSIDE THE REPOSITORY YOU COMMIT AND PUSH. THIS DIRECTORY WILL CONTAIN LARGE FILES WHEN THE RUNNER IS RUN AND WHEN YOU START RUNNING THE WORKFLOW.
 
 ```bash
 mkdir actions-runner && cd actions-runner
@@ -180,7 +186,7 @@ tar xzf actions-runner-linux-x64-2.322.0.tar.gz
 ```
 GitHub’s docs describe this exact process for registering a self-hosted runner.
 
-8. Install and configure the runner
+### Install and configure the runner
 
 Run the commands GitHub gives you on your Ubuntu VM. 
 - Download:
@@ -191,7 +197,7 @@ Run the commands GitHub gives you on your Ubuntu VM.
 
 GitHub’s runner will now appear in Settings → Actions → Runners as “Online”.
 
-Then start the runner. Leave this running in a terminal
+Then start the runner. Leave this running in another terminal
 ```bash
 ./run.sh
 ```
@@ -207,7 +213,7 @@ Check status
 sudo ./svc.sh status
 ```
 
-9. Make sure the runner user can use Docker and kubectl
+### Make sure the runner user can use Docker and kubectl
 The runner process runs as the user that started it. That user must:
 - Be able to run docker without `sudo`. [Docker without sudo](https://docs.docker.com/engine/install/linux-postinstall/)
 - Have a valid kubeconfig in `~/.kube/config`.
@@ -228,3 +234,94 @@ kubectl access
 
 The runner inherits this environment when started from an interactive shell. For a systemd service, you’ll set `Environment=`lines. 
 
+
+### Create workflow  
+- The workflow must be located at `.github/workflows`. GitHub automatically discovers workflow yaml files in this directory. Create the directory and create the `deploy-kustomize.yaml` file where we will define the job to automate our CI/CD
+```bash
+mkdir -p .github/workflows/
+touch .github/workflows/deploy-kustomize.yaml
+```
+
+### Workflow behavior
+The filename can be any descriptive .yml or .yaml filename under .github/workflows/. The top-level name: field controls the display name in the GitHub Actions interface.
+The workflow performs the following steps:
+1. Checks out the commit that triggered the run.
+2. Verifies Docker, kubectl, and cluster access on the self-hosted runner.
+3. Creates a seven-character image tag from GITHUB_SHA.
+4. Logs in to Docker Hub using GitHub Actions secrets.
+5. Configures Docker Buildx.
+6. Builds and pushes the application image to Docker Hub.
+7. Copies the kubernetes/ directory to the runner's temporary directory.
+8. Replaces newTag: placeholder in the temporary Kustomize overlay with the current commit tag.
+9. Renders the Kustomize overlay with kubectl kustomize.
+10. Validates the generated manifests with server-side dry run.
+11. Deletes the previous db-init-job if it exists.
+12. Applies the Kustomize overlay to the local cluster.
+13. Waits for MySQL Deployment rollout.
+14. Waits for web application Deployment rollout.
+15. Waits for database initialization Job completion.
+16. Prints deployment, Pod, Service, PVC, PV, and image status.
+
+
+### Useful verification commands
+Check all workload resources in the CI/CD namespace:
+kubectl get all -n cicd-test
+
+Check static storage:
+```bash
+kubectl get pvc -n cicd-test
+kubectl get pv cicd-test-mysql-pv
+```
+
+Check rollout status:
+```bash
+kubectl rollout status deployment/mysql \
+  -n cicd-test \
+  --timeout=180s
+```  
+
+```bash
+kubectl rollout status deployment/ecom-webapp \
+  -n cicd-test \
+  --timeout=180s
+```
+
+Check the deployed image:
+```bash
+kubectl get deployment ecom-webapp \
+  -n cicd-test \
+  -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
+```
+
+Check application readiness from a web Pod:
+```bash
+kubectl exec -it deployment/ecom-webapp \
+  -n cicd-test \
+  -- sh -c 'echo "$DB_HOST"; wget -qO- http://127.0.0.1/readyz.php'
+```
+
+Inspect failing Pods:
+```bash
+kubectl get pods -n cicd-test
+kubectl describe pod <pod-name> -n cicd-test
+kubectl logs <pod-name> -n cicd-test
+```
+
+### Security notes
+Docker Hub credentials are stored as GitHub Actions secrets. They are not committed into the repository.
+The current database Secret manifest uses Base64-encoded values. Base64 is encoding, not encryption, and it should not be treated as a production secret-management solution.
+
+
+### Future improvements
+After validating this local implementation, future enhancements include:
+• Move the deployment trigger from `cicd-kustomize` to `master` through an intentional pull request and branch strategy.
+• Create separate `development`, `staging`, and `production` Kustomize overlays.
+• Deploy the same architecture to Amazon EKS.
+• Replace the local self-hosted runner approach with an EKS-compatible runner or GitHub-hosted runner using AWS OIDC.
+• Use AWS Secrets Manager, Vault, or External Secrets Operator for database credentials.
+• Add automated application tests before Docker image publishing.
+• Add image vulnerability scanning.
+• Add Kustomize validation and policy checks before deployment.
+• Pin third-party GitHub Actions to full commit SHAs for supply-chain hardening.
+• Add GitOps reconciliation and pruning with Argo CD or Flux.
+• Replace the database initialization Job with a migration strategy suitable for repeated deployments.
