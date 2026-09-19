@@ -35,7 +35,7 @@ This project documents my hands-on work with:
 Extras:
 - [Implement-Persistent-Storage](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/6a965c06f28ddfc23d42fa15fe0d9b6edbbd1f3c/docs/Extras/Implement-Persistent-Storage.md)
 - [Package-Everything-in-Helm](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/82459a780cbccd156727be8e4bef3bb5cf458374/docs/Extras/Package-Everything-in-Helm.md)
-- [Package-Everything-in-Helm]()
+- [Implement-Basic-CICD-Pipeline-GitHub-Actions-Docker-Hub-Kustomize](https://github.com/CoyApilado18/learning-app-ecommerce-K8s-Resume-Challenge/blob/57a30ba59f14aac333e67e4b8ed1ca7f5a7a6f10/docs/Extras/Implement-Basic-CICD-Pipeline-GitHub-Actions-Docker-Hub-Kustomize.md)
 
 ## Build your local kubeadm homelab
 - See my gitub repo to build your local kubeadm cluster https://github.com/CoyApilado18/Build-your-local-Kubernetes-cluster.git with one Controlplane and one Worker node. I used Ubuntu 22.04 for this project.
