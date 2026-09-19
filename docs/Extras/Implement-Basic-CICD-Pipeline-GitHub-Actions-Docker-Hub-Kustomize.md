@@ -75,7 +75,7 @@ A self-hosted runner solves this by running the GitHub Actions job on the same U
 The workflow uses these runner labels:
 `runs-on: [self-hosted, local-k8s]`
 
-`self-hosted` identifies a runner managed locally instead of a GitHub-hosted virtual machine. 
+`self-hosted` identifies a runner managed locally instead of a GitHub-hosted virtual machine.  
 `local-k8s` is a custom label used to ensure this workflow is routed to the local Kubernetes-capable runner.
 
 # Goal
